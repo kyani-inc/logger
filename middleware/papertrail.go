@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/go-martini/martini"
 	"github.com/kyani-inc/go-utils/ip"
+	"github.com/kyani-inc/logger"
 )
 
 // Papertrail is a Martini Middleware that emulates their default logger in
@@ -22,7 +22,7 @@ import (
 // The result appears in Papertrail as:
 // [info] 200 OK HEAD 1.109259ms /my/endpoint/ "8.8.8.8"
 func Papertrail() martini.Handler {
-	return func(res http.ResponseWriter, req *http.Request, c martini.Context, log *logrus.Logger) {
+	return func(res http.ResponseWriter, req *http.Request, c martini.Context, log logger.Client) {
 		start := time.Now()
 
 		// Get a single IP Address of the connecting party
