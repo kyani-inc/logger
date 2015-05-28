@@ -14,7 +14,9 @@ type Config struct {
 	Appname string
 	Host    string
 	Port    int
+}
 
+type Client struct {
 	*logrus.Logger
 }
 
@@ -30,17 +32,19 @@ func Logger() *logrus.Logger {
 
 // New creates a new instance of a
 // logger based on provided config data
-func New(config Config) Config {
-	config.Logger = logrus.New()
+func New(config Config) Client {
+	var client Client
+
+	client.Logger = logrus.New()
 	hook, err := logrus_papertrail.NewPapertrailHook(config.Host, config.Port, config.Appname)
 	hook.UseHostname()
 
 	// Register the PaperTrail hook
 	if err == nil {
-		config.Logger.Hooks.Add(hook)
+		client.Logger.Hooks.Add(hook)
 	}
 
-	return config
+	return client
 }
 
 // DefaultConfig makes certain assumptions about your environment variables
