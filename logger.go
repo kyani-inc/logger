@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/polds/logrus/hooks/papertrail"
+	"gopkg.in/polds/logrus-papertrail-hook.v2"
 )
 
 var __l *logrus.Logger
@@ -35,9 +35,15 @@ func Logger() *logrus.Logger {
 func New(config Config) Client {
 	var client Client
 
+	host, _ := os.Hostname()
+
 	client.Logger = logrus.New()
-	hook, err := logrus_papertrail.NewPapertrailHook(config.Host, config.Port, config.Appname)
-	hook.UseHostname()
+	hook, err := logrus_papertrail.NewPapertrailHook(&logrus_papertrail.Hook{
+		Host:     config.Host,
+		Port:     config.Port,
+		Appname:  config.Appname,
+		Hostname: host,
+	})
 
 	// Register the PaperTrail hook
 	if err == nil {
