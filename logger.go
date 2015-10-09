@@ -53,12 +53,11 @@ func DefaultConfig() Config {
 	app := os.Getenv("APPNAME")
 	if app == "" {
 		app, _ = os.Hostname()
-		os.Setenv("APPNAME", app)
 	}
 
 	port, _ := strconv.Atoi(os.Getenv("PAPERTRAIL_PORT"))
 	return Config{
-		Appname: os.Getenv("APPNAME"),
+		Appname: app,
 		Host:    os.Getenv("PAPERTRAIL_HOST"),
 		Port:    port,
 	}
