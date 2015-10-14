@@ -9,7 +9,7 @@ import (
 	"github.com/kyani-inc/logger"
 )
 
-// Papertrail is a Martini Middleware that emulates their default logger in
+// Martini is a Martini Middleware that emulates their default logger in
 // the sense that it logs every request and sends it to Papertrail.
 // The logger gets the following info:
 // 	- Time taken for request
@@ -21,7 +21,7 @@ import (
 //
 // The result appears in Papertrail as:
 // [info] 200 OK HEAD 1.109259ms /my/endpoint/ "8.8.8.8"
-func Papertrail() martini.Handler {
+func Martini() martini.Handler {
 	return func(res http.ResponseWriter, req *http.Request, c martini.Context, log logger.Client) {
 		start := time.Now()
 
