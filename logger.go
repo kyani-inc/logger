@@ -38,6 +38,9 @@ func New(config Config) Client {
 	host, _ := os.Hostname()
 
 	client.Logger = logrus.New()
+	client.Logger.Formatter = &logrus.TextFormatter{
+		ForceColors: true,
+	}
 	hook, err := logrus_papertrail.NewPapertrailHook(&logrus_papertrail.Hook{
 		Host:     config.Host,
 		Port:     config.Port,
