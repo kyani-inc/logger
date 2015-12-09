@@ -5,12 +5,12 @@ import (
 	"time"
 
 	"github.com/kyani-inc/go-utils/ip"
-	"gopkg.in/kyani-inc/logger.v2"
+	"github.com/kyani-inc/logger"
 
 	"github.com/labstack/echo"
 )
 
-func Echo(log logger.Client) echo.MiddlewareFunc {
+func Echo(log logger.Client, prefixes ...interface{}) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c *echo.Context) error {
 			start := time.Now()
@@ -23,7 +23,9 @@ func Echo(log logger.Client) echo.MiddlewareFunc {
 			}
 
 			latency := time.Since(start)
-			log.Infof("%v %s %s %v %s \"%s\"", c.Response().Status(), http.StatusText(c.Response().Status()), c.Request().Method, latency, c.Request().URL.Path, addr)
+			// Create the prefix for the logger
+			prefix := makePrefixes(c, prefixes...)
+			log.Infof("%s%v %s %s %v %s \"%s\"", prefix, c.Response().Status(), http.StatusText(c.Response().Status()), c.Request().Method, latency, c.Request().URL.Path, addr)
 
 			return nil
 		}
