@@ -21,7 +21,7 @@ import (
 //
 // The result appears in Papertrail as:
 // [info] 200 OK HEAD 1.109259ms /my/endpoint/ "8.8.8.8"
-func Martini() martini.Handler {
+func Martini(prefixes ...interface{}) martini.Handler {
 	return func(res http.ResponseWriter, req *http.Request, c martini.Context, log logger.Client) {
 		start := time.Now()
 
@@ -31,6 +31,7 @@ func Martini() martini.Handler {
 		rw := res.(martini.ResponseWriter)
 		c.Next()
 
-		log.Infof("%v %s %s %v %s \"%s\"", rw.Status(), http.StatusText(rw.Status()), req.Method, time.Since(start), req.URL.Path, addr)
+		prefix := makePrefixes(c, prefixes...)
+		log.Infof("%s%v %s %s %v %s \"%s\"", prefix, rw.Status(), http.StatusText(rw.Status()), req.Method, time.Since(start), req.URL.Path, addr)
 	}
 }
