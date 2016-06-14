@@ -7,7 +7,7 @@ import (
 	"github.com/kyani-inc/go-utils/ip"
 	"github.com/kyani-inc/logger"
 
-	"github.com/labstack/echo"
+	"github.com/kyani-inc/echo"
 )
 
 func Echo(log logger.Client, prefixes ...interface{}) echo.MiddlewareFunc {
