@@ -63,16 +63,26 @@ func DefaultConfig() Config {
 	if app == "" {
 		app, _ = os.Hostname()
 	}
+	if os.Getenv("PAPERTRAIL_PORT") != "" {
+		port, _ := strconv.Atoi(os.Getenv("PAPERTRAIL_PORT"))
+		return Config{
+			Appname: app,
+			Host:    os.Getenv("PAPERTRAIL_HOST"),
+			Port:    port,
+		}
+	}
 
-	port, _ := strconv.Atoi(os.Getenv("PAPERTRAIL_PORT"))
 	return Config{
 		Appname: app,
-		Host:    os.Getenv("PAPERTRAIL_HOST"),
-		Port:    port,
+		Host:    os.Getenv("SUMO_ENDPOINT"),
 	}
 }
 
 // @TODO polds deprecate this function
 func NewLogger() *logrus.Logger {
 	return New(DefaultConfig()).Logger
+}
+
+func NewLoggerSumo() *logrus.Logger {
+	return NewSumo(DefaultConfig()).Logger
 }
