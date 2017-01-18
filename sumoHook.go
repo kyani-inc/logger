@@ -24,13 +24,19 @@ func NewSumo(config Config) Client {
 	client.Logger.Formatter = &logrus.TextFormatter{
 		ForceColors: false,
 	}
-	hook, _ := NewSumoHook(config.Host, host)
+	hook, err := NewSumoHook(config.Host, host)
+	if err != nil {
+		fmt.Println(err.Error())
+		return client
+	}
 	client.Logger.Hooks.Add(hook)
-
 	return client
 }
 
 func NewSumoHook(url string, appname string) (*SumoLogicHook, error) {
+	if url == "" {
+		return nil, fmt.Errorf("Unable to send logs to Sumo Logic. SUMO_ENDPOINT not provided")
+	}
 	client := &http.Client{}
 	return &SumoLogicHook{url, client, make([][]byte, 0), appname}, nil
 }
@@ -72,8 +78,10 @@ func (hook *SumoLogicHook) Fire(entry *logrus.Entry) error {
 }
 
 func (hook *SumoLogicHook) httpPost(s []byte) error {
+	// already printed error about sumo_endpoint so be silent
 	if hook.Url == "" {
-		return fmt.Errorf("Unable to push logs to Sumo Logic. SUMO_ENDPOINT not provided")
+		// avoid panic and return if no url
+		return nil
 	}
 	body := bytes.NewBuffer(s)
 	req, err := http.NewRequest("POST", hook.Url, body)
