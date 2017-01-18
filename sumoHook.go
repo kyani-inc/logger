@@ -72,6 +72,9 @@ func (hook *SumoLogicHook) Fire(entry *logrus.Entry) error {
 }
 
 func (hook *SumoLogicHook) httpPost(s []byte) error {
+	if hook.Url == "" {
+		return fmt.Errorf("Unable to push logs to Sumo Logic. SUMO_ENDPOINT not provided")
+	}
 	body := bytes.NewBuffer(s)
 	req, err := http.NewRequest("POST", hook.Url, body)
 	client := http.Client{}
