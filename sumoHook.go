@@ -13,7 +13,6 @@ import (
 type SumoLogicHook struct {
 	Url             string
 	HttpClient      *http.Client
-	PendingMessages [][]byte
 	AppName         string
 }
 
@@ -38,7 +37,7 @@ func NewSumoHook(url string, appname string) (*SumoLogicHook, error) {
 		return nil, fmt.Errorf("Unable to send logs to Sumo Logic. SUMO_ENDPOINT not provided")
 	}
 	client := &http.Client{}
-	return &SumoLogicHook{url, client, make([][]byte, 0), appname}, nil
+	return &SumoLogicHook{url, client, appname}, nil
 }
 
 func (hook *SumoLogicHook) Fire(entry *logrus.Entry) error {
@@ -54,24 +53,12 @@ func (hook *SumoLogicHook) Fire(entry *logrus.Entry) error {
 	data["tstamp"] = entry.Time.Format(logrus.DefaultTimestampFormat)
 	data["message"] = strings.Replace(entry.Message, "\"", "'", -1)
 	data["level"] = entry.Level.String()
-
 	s, err := json.Marshal(data)
 	if err != nil {
 		return fmt.Errorf("Failed to build json: %v", err)
 	}
-	// attempt to process pending messages first
-	if len(hook.PendingMessages) != 0 {
-		for i, m := range hook.PendingMessages {
-			err := hook.httpPost(m)
-			if err == nil {
-				hook.PendingMessages, hook.PendingMessages[len(hook.PendingMessages)-1] = append(hook.PendingMessages[:i], hook.PendingMessages[i+1:]...), nil
-			}
-		}
-	}
 	err = hook.httpPost(s)
 	if err != nil {
-		// stash messages for next run
-		hook.PendingMessages = append(hook.PendingMessages, s)
 		return err
 	}
 	return nil
@@ -79,7 +66,7 @@ func (hook *SumoLogicHook) Fire(entry *logrus.Entry) error {
 
 func (hook *SumoLogicHook) httpPost(s []byte) error {
 	// already printed error about sumo_endpoint so be silent
-	if hook.Url == "" {
+	if hook.Url == "" || len(s) == 0 {
 		// avoid panic and return if no url
 		return nil
 	}
