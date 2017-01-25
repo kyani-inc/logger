@@ -11,9 +11,9 @@ import (
 )
 
 type SumoLogicHook struct {
-	Url             string
-	HttpClient      *http.Client
-	AppName         string
+	Url        string
+	HttpClient *http.Client
+	AppName    string
 }
 
 func NewSumo(config Config) Client {
@@ -70,21 +70,26 @@ func (hook *SumoLogicHook) httpPost(s []byte) error {
 		// avoid panic and return if no url
 		return nil
 	}
+
 	body := bytes.NewBuffer(s)
 	req, err := http.NewRequest("POST", hook.Url, body)
-	client := http.Client{}
-	if req == nil {
-		return fmt.Errorf("Something went wrong")
+	if err != nil {
+		return fmt.Errorf("Error creating the request: %s", err.Error())
 	}
+
+	req.Close = true
 	req.Header.Add("X-Sumo-Name", hook.AppName)
+	client := http.Client{}
 	resp, err := client.Do(req)
-	if err != nil || resp == nil {
+	if err != nil {
 		return fmt.Errorf("Failed to post data: %s", err.Error())
-	} else if resp.StatusCode != 200 {
-		return fmt.Errorf("Failed to post data: %s", resp.Status)
-	} else {
-		return nil
 	}
+
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("Failed to post data: %s", resp.Status)
+	}
+	return nil
 }
 
 func (s *SumoLogicHook) Levels() []logrus.Level {
