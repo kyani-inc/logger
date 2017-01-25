@@ -91,7 +91,6 @@ func (hook *SumoLogicHook) httpPost(s []byte) error {
 	}
 	req.Header.Add("X-Sumo-Name", hook.AppName)
 	resp, err := client.Do(req)
-	defer resp.Body.Close()
 	if err != nil || resp == nil {
 		return fmt.Errorf("Failed to post data: %s", err.Error())
 	} else if resp.StatusCode != 200 {
@@ -99,7 +98,6 @@ func (hook *SumoLogicHook) httpPost(s []byte) error {
 	} else {
 		return nil
 	}
-
 }
 
 func (s *SumoLogicHook) Levels() []logrus.Level {
