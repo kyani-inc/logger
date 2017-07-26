@@ -50,7 +50,7 @@ func (hook *SumoLogicHook) Fire(entry *logrus.Entry) error {
 			data[k] = v
 		}
 	}
-	data["tstamp"] = entry.Time.Format(logrus.DefaultTimestampFormat)
+
 	data["message"] = strings.Replace(entry.Message, "\"", "'", -1)
 	data["level"] = entry.Level.String()
 	s, err := json.Marshal(data)
