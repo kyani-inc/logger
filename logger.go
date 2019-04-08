@@ -4,7 +4,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"gopkg.in/polds/logrus-papertrail-hook.v2"
 )
 
