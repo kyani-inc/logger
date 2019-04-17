@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/sirupsen/logrus"
-	"github.com/kyani-inc/logrus-papertrail-hook"
+	"gopkg.in/kyani-inc/logrus-papertrail-hook.v3"
 )
 
 var __l *logrus.Logger
