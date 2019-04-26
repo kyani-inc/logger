@@ -4,10 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"os"
-	"strings"
 )
 
 type SumoLogicHook struct {
@@ -19,16 +17,13 @@ type SumoLogicHook struct {
 func NewSumo(config Config) Client {
 	var client Client
 	host, _ := os.Hostname()
-	client.Logger = logrus.New()
-	client.Logger.Formatter = &logrus.TextFormatter{
-		ForceColors: false,
-	}
+	client.Logger = New(config).Logger
 	hook, err := NewSumoHook(config.Host, host)
 	if err != nil {
 		fmt.Println(err.Error())
 		return client
 	}
-	client.Logger.Hooks.Add(hook)
+	client.Logger.Hook = hook
 	return client
 }
 
@@ -40,20 +35,8 @@ func NewSumoHook(url string, appname string) (*SumoLogicHook, error) {
 	return &SumoLogicHook{url, client, appname}, nil
 }
 
-func (hook *SumoLogicHook) Fire(entry *logrus.Entry) error {
-	data := make(logrus.Fields, len(entry.Data))
-	for k, v := range entry.Data {
-		switch v := v.(type) {
-		case error:
-			data[k] = v.Error()
-		default:
-			data[k] = v
-		}
-	}
-
-	data["message"] = strings.Replace(entry.Message, "\"", "'", -1)
-	data["level"] = entry.Level.String()
-	s, err := json.Marshal(data)
+func (hook *SumoLogicHook) Fire(entry Log) error {
+	s, err := json.Marshal(entry)
 	if err != nil {
 		return fmt.Errorf("Failed to build json: %v", err)
 	}
@@ -92,13 +75,13 @@ func (hook *SumoLogicHook) httpPost(s []byte) error {
 	return nil
 }
 
-func (s *SumoLogicHook) Levels() []logrus.Level {
-	return []logrus.Level{
-		logrus.PanicLevel,
-		logrus.FatalLevel,
-		logrus.ErrorLevel,
-		logrus.WarnLevel,
-		logrus.InfoLevel,
-		logrus.DebugLevel,
+func (s *SumoLogicHook) Levels() []LogLevel {
+	return []LogLevel{
+		PanicLevel,
+		FatalLevel,
+		ErrorLevel,
+		WarnLevel,
+		InfoLevel,
+		DebugLevel,
 	}
 }
