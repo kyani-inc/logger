@@ -48,8 +48,9 @@ const (
 	DebugLevel LogLevel = "DEBUG"
 )
 
-func (logger *Logger) Info(message string) {
-	logger.logit(logger.Out, InfoLevel, message, nil, nil)
+func (logger *Logger) Info(message ...interface{}) {
+	msg := fmt.Sprint(message)
+	logger.logit(logger.Out, InfoLevel, msg, nil, nil)
 }
 
 func (logger *Logger) Infof(message string, args ...interface{}) {
@@ -64,8 +65,9 @@ func (logger *Logger) InfofWithResponse(res *http.Response, message string, args
 	logger.logit(logger.Out, InfoLevel, fmt.Sprintf(message, args...), res, nil)
 }
 
-func (logger *Logger) Error(message string) {
-	logger.logit(logger.Out, ErrorLevel, message, nil, nil)
+func (logger *Logger) Error(message ...interface{}) {
+	msg := fmt.Sprint(message)
+	logger.logit(logger.Out, ErrorLevel, msg, nil, nil)
 }
 
 func (logger *Logger) Errorf(message string, args ...interface{}) {
@@ -103,9 +105,9 @@ func (logger *Logger) logit(Out io.Writer, level LogLevel, message string, res *
 	} else {
 		bodyToWrite := ""
 		if log.HttpBodyDump != "" {
-			bodyToWrite = fmt.Sprintf("[%s] %s [%s] %s {%s} : %s", log.AppName, log.Date.String(), log.LogLevel, log.Message, log.HttpBodyDump, log.FuncCall)
+			bodyToWrite = fmt.Sprintf("[%s] [%s] (%s) ***%s*** {%s} : %s", log.LogLevel, log.AppName, log.Date.String(), log.Message, log.HttpBodyDump, log.FuncCall)
 		} else {
-			bodyToWrite = fmt.Sprintf("[%s] %s [%s] %s : %s", log.AppName, log.Date.String(), log.LogLevel, log.Message, log.FuncCall)
+			bodyToWrite = fmt.Sprintf("[%s] [%s] (%s) ***%s*** %s", log.LogLevel, log.AppName, log.Date.String(), log.Message, log.FuncCall)
 		}
 		logger.Out.Write([]byte(bodyToWrite))
 	}
