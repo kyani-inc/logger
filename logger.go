@@ -79,10 +79,16 @@ func DefaultConfig() Config {
 }
 
 // @TODO polds deprecate this function
+// Killing this, no longer using sumologic or papertrail
 func NewLogger() *logrus.Logger {
-	return New(DefaultConfig()).Logger
+	var log = logrus.New()
+	log.Out = os.Stdout
+	return log
 }
 
+// Killing this, no longer using sumologic
 func NewLoggerSumo() *logrus.Logger {
-	return NewSumo(DefaultConfig()).Logger
+	var log = logrus.New()
+	log.Out = os.Stdout
+	return log
 }
